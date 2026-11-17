@@ -1,6 +1,6 @@
 # Cardputer Duo OS starter — milestone 165
 
-Paired ESP-IDF 5.x firmware for M5Stack Cardputer ADV (main menu, keyboard, and SD owner) and a CYD-class ESP32 board (second display). The CYD display driver and pins follow the active TFT_eSPI setup at `C:\Users\galen\OneDrive\Documents\Arduino\libraries\TFT_eSPI\User_Setup.h`. Touch input is not initialized or used.
+Paired ESP-IDF 5.x firmware for M5Stack Cardputer ADV (main menu, keyboard, and SD owner) and a CYD-class ESP32 board (second display). 
 
 ## Project direction
 This is an evolving GUI environment, not a finished firmware release. Keep the Cardputer ADV as the keyboard/input device and SD-card host, and keep the CYD as a coordinated display. Touch remains disabled unless requested. The intended end state is a cohesive visual shell with launchable GUI apps and user-customizable SD-card scripts. Continue iterating toward it in these areas:
@@ -201,16 +201,6 @@ Power each board from its own USB connection. Connect grounds and cross TX/RX:
 - CYD display follows the active TFT_eSPI setup: ST7789, 240 × 320 portrait, BGR color order, and 40 MHz display SPI. Its configured pins are TFT MISO=12, MOSI=13, SCLK=14, CS=15, DC=2, reset board-managed, backlight=21. The TFT_eSPI setup enables inversion, but the photographed panel output was visibly inverted with that setting, so this firmware disables inversion. Confirm display pins against the actual board revision.
 - The CYD display uses upright 320 × 240 landscape orientation.
 
-## Build
-Requires ESP-IDF 5.x and Component Manager. From this folder:
-
-```powershell
-idf.py -B ..\..\..\build-cardputer-clang -D SDKCONFIG=sdkconfig.cardputer build
-idf.py -B build-cyd-clang2 -D SDKCONFIG=sdkconfig.cyd build
-```
-
-The project VS Code settings select `C:/Espressif/frameworks/esp-idf-v5.5.5-2/`, matching the installation used for the builds above. If your installation is in a different folder, use **ESP-IDF: Select Current ESP-IDF Version** in VS Code to select that installed version.
-
 The project keeps separate configuration files for its two chips: `sdkconfig.cardputer` targets ESP32-S3, and `sdkconfig.cyd` targets ESP32. The VS Code workspaces set `IDF_TOOLCHAIN=clang`; ESP-IDF 5.5.5 marks this toolchain experimental, but it avoids the GCC internal compiler crash in the current Cardputer build. The Cardputer build is outside the long project path to avoid Windows object-path limits. Pass the matching sdkconfig file on every build, reconfigure, or flash command; do not use `set-target` on the shared project because that command regenerates the selected sdkconfig. To flash, use `idf.py -B ..\..\..\build-cardputer-clang -D SDKCONFIG=sdkconfig.cardputer -p COMxx flash` for the Cardputer and `idf.py -B build-cyd-clang2 -D SDKCONFIG=sdkconfig.cyd -p COMyy flash` for the CYD, replacing each port with the one Windows assigned. A successful CYD flash does not update the Cardputer. Use the P5/P3-to-Grove UART wiring above; keep the 5 V pins disconnected.
 
 In VS Code, open `cardputer-duo-cardputer.code-workspace` to build or flash the Cardputer, or `cardputer-duo-cyd.code-workspace` for the CYD. Each workspace selects the matching build directory and SDKConfig file. Use UART flashing and select that board's port under **ESP-IDF: Select Port to Use**; do not rely on a fixed COM number because Windows assigns it per device and computer. JTAG flashing requires a connected and configured JTAG probe, which is not part of the documented wiring.
@@ -250,7 +240,8 @@ CLEAR
 END
 ```
 
-The on-device Templates gallery includes **App Hub**, a customizable keyboard-operated launcher. It routes to the bundled Duo Dashboard and Theme Studio, or opens an SD script app by its filename stem. It demonstrates `SET_TEXT TARGET dashboard`, `IF_APP ${TARGET}.duo`, and `OPEN_APP ${TARGET}.duo`; an unknown app displays a message and returns to the Hub. Its source is [examples/app-hub.duo](C:/Users/gray0/Documents/Codex/2026-10-16/referenced-chatgpt-conversation-this-is-an/outputs/cardputer-duo-os/examples/app-hub.duo). Copy a saved Hub to `/scripts` on the Cardputer. Fn+backtick from a child app returns to the Hub; its selected route is restored automatically through `LOAD_STATE`. A root app with no caller exits to Home; child apps can use `RETURN_APP` for an explicit return.
+The on-device Templates gallery includes **App Hub**, a customizable keyboard-operated launcher. It routes to the bundled Duo Dashboard and Theme Studio, or opens an SD script app by its filename stem. It demonstrates `SET_TEXT TARGET dashboard`, `IF_APP ${TARGET}.duo`, and `OPEN_APP ${TARGET}.duo`; an unknown app displays a message and returns to the Hub. Copy a saved Hub to `/scripts` on the Cardputer. Fn+` from a child app returns to the Hub; its selected route is restored automatically through `LOAD_STATE`. A root app with no caller exits to Home; child apps can use `RETURN_APP` for an explicit return.
+
 The **Native Tool Deck** template demonstrates cross-launching built-in tools from a customizable script app. Install it from Home → Templates. `OPEN_TOOL id` accepts `canvas`, `counter`, `calculator`, `palette`, `guide`, `templates`, `status`, `stopwatch`, or `timer`; it also accepts a text placeholder, such as `SET_TEXT TOOL timer` followed by `OPEN_TOOL ${TOOL}`. The script pauses while the tool is open and continues at the following command when the tool exits. Use `SAVE_STATE` and `LOAD_STATE` for settings that should survive later app launches.
 
 
