@@ -1,5 +1,4 @@
-Here’s a paste-ready README draft. I’ve described CYD Bluetooth audio as experimental because the connection flow is still being worked on.
-Cardputer Duo OS
+# Cardputer Duo OS
 Cardputer Duo OS is a two-board firmware project that turns an M5Stack Cardputer ADV and a CYD display into a small, keyboard-first app platform. The Cardputer runs the launcher, reads the SD card, and handles user input. The CYD acts as a second display, mirroring menus and app screens over a serial link.
 
 The project is built with ESP-IDF. It includes built-in apps, a script editor, customizable SD-card apps, settings, and a shared GUI toolkit. Touch input is disabled; you navigate with the Cardputer keyboard.
